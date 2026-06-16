@@ -1,0 +1,16 @@
+RewriteEngine On
+RewriteBase /
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.php [QSA,L]
+
+ErrorDocument 404 /error.php?code=404
+ErrorDocument 500 /error.php?code=500
+ErrorDocument 403 /error.php?code=403
+
+# sse.php — disable all buffering so event-stream reaches the client
+<Files "sse.php">
+    SetEnv no-gzip 1
+    Header set Cache-Control "no-cache"
+    Header set X-Accel-Buffering "no"
+</Files>

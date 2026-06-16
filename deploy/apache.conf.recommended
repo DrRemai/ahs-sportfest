@@ -1,0 +1,63 @@
+# Endgame Tournaments — recommended Apache 2.4 VHost
+# Place in /etc/apache2/sites-available/endgame.conf
+# Enable: a2ensite endgame && systemctl reload apache2
+#
+# Requires: mod_deflate, mod_headers, mod_rewrite (a2enmod deflate headers rewrite)
+
+<VirtualHost *:80>
+    ServerName yourdomain.com
+    DocumentRoot /var/www/endgame/public
+
+    <Directory /var/www/endgame/public>
+        AllowOverride All
+        Require all granted
+        Options -Indexes
+
+        # ---------------------------------------------------------------------------
+        # SPA routing — all non-file, non-API paths → index.php
+        # ---------------------------------------------------------------------------
+        RewriteEngine On
+        RewriteCond %{REQUEST_FILENAME} !-f
+        RewriteCond %{REQUEST_FILENAME} !-d
+        RewriteCond %{REQUEST_URI} !^/api/
+        RewriteRule ^ index.php [L]
+
+        # ---------------------------------------------------------------------------
+        # Compression
+        # ---------------------------------------------------------------------------
+        AddOutputFilterByType DEFLATE text/html text/css application/javascript application/json
+
+        # ---------------------------------------------------------------------------
+        # Static asset caching (immutable — versioned via manifest hash)
+        # ---------------------------------------------------------------------------
+        <FilesMatch "\.(css|js|woff2|woff|ttf|png|svg|ico|webp)$">
+            Header set Cache-Control "public, max-age=31536000, immutable"
+        </FilesMatch>
+
+        # ---------------------------------------------------------------------------
+        # No cache for dynamic responses
+        # ---------------------------------------------------------------------------
+        <FilesMatch "^(index\.php|sse\.php)$">
+            Header set Cache-Control "no-store, no-cache"
+        </FilesMatch>
+    </Directory>
+
+    # ---------------------------------------------------------------------------
+    # SSE — disable proxy buffering (nginx in front: proxy_buffering off)
+    # ---------------------------------------------------------------------------
+    <Location /sse.php>
+        Header set X-Accel-Buffering "no"
+    </Location>
+
+    # ---------------------------------------------------------------------------
+    # Logging
+    # ---------------------------------------------------------------------------
+    ErrorLog  /var/log/apache2/endgame_error.log
+    CustomLog /var/log/apache2/endgame_access.log combined
+</VirtualHost>
+
+# HTTPS redirect (uncomment once SSL is configured with certbot)
+# <VirtualHost *:80>
+#     ServerName yourdomain.com
+#     Redirect permanent / https://yourdomain.com/
+# </VirtualHost>

@@ -1,0 +1,11 @@
+config.php
+config.test.php
+.env
+vendor/
+node_modules/
+debug.log
+*.log
+public/assets/dist/
+.phpunit.result.cache
+.vscode/
+.idea/
