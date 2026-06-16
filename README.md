@@ -155,7 +155,7 @@ Formatspezifische Einstellungen (Gruppenanzahl, Punkte pro Sieg, Seedingmodus us
 
 ## Hinweis
 
-Erstellt von [Dein Name / Abitur-Jahrgang] für [Name der Schule].
+Erstellt von Rémai-Sleisz Domonkos (7BSc 25/26) für AHS Korneuburg.
 Siehe [CONTRIBUTING.md](CONTRIBUTING.md), falls du das Projekt übernimmst oder weiterentwickeln möchtest.
 
 ---
