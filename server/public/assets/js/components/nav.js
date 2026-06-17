@@ -1,7 +1,6 @@
 // SCHOOL: i18n — rebranded to AHS Sportfest, all strings translated to German
 import { state, api } from '../app.js';
 import { navigate, link } from '../router.js';
-import { showAboutPage } from '../views/about.js';
 import { toast } from './toast.js';
 import { trapFocus, releaseFocus } from '../utils/focus-trap.js';
 import { sseOn, registerReconnectIndicator } from '../utils/sse-client.js';
@@ -36,7 +35,7 @@ function renderNav() {
   const isLight = document.documentElement.dataset.theme === 'light';
 
   nav.innerHTML = `
-    <a href="/" class="nav-brand" id="nav-brand">${t('app.brand')}</a>
+    <a href="/" data-link class="nav-brand">${t('app.brand')}</a>
     <div class="nav-links" role="list">
       ${link('/', t('nav.tournaments'))}
       ${isAdmin ? link('/admin', t('nav.admin')) : ''}
@@ -71,15 +70,6 @@ function renderNav() {
   nav.querySelector('#nav-logout')?.addEventListener('click', logout);
   nav.querySelector('#nav-notif-btn')?.addEventListener('click', openDrawer);
   nav.querySelector('#nav-theme-toggle')?.addEventListener('click', toggleTheme);
-
-  nav.querySelector('#nav-brand').addEventListener('click', e => {
-    e.preventDefault();
-    if (window.location.pathname === '/' && !state.aboutPageOpen) {
-      showAboutPage();
-    } else {
-      navigate('/');
-    }
-  });
 
   const hamburger = nav.querySelector('#nav-hamburger');
   hamburger?.addEventListener('click', () => {

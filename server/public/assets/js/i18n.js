@@ -6,14 +6,6 @@ const dict = {
   // ── App brand ───────────────────────────────────────────────────────────────
   'app.brand':                    'AHS Sportfest',
 
-  // ── Über-Seite (Logo-Klick auf Startseite) ──────────────────────────────────
-  'about.title':                  'Über AHS Sportfest',
-  'about.subtitle':               'Die Turnierverwaltungsplattform für das Sportfest unserer Schule.',
-  'about.project.title':          'Über das Projekt',
-  'about.tech.title':             'Technik',
-  'about.features.title':         'Funktionen',
-  'about.back':                   'Zurück zu den Turnieren',
-
   // ── Navigation ──────────────────────────────────────────────────────────────
   'nav.tournaments':              'Turniere',
   'nav.admin':                    'Admin',

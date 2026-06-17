@@ -21,10 +21,9 @@ declare(strict_types=1);
  * for sorting purposes, serialised as null in the API response (displayed as ∞).
  *
  * When config['groups'] > 1 the team list is split into equal groups.
- * Each group plays its own round-robin; group_label ('A', 'B', …) identifies
- * which group a match belongs to; bracket_side is always 'none'.
- * standingsByGroup() returns per-group rankings and is used by MultiStage for
- * cross-bracket seeding.
+ * Each group plays its own round-robin; bracket_side ('A', 'B', …) identifies
+ * which group a match belongs to. standingsByGroup() returns per-group rankings
+ * and is used by MultiStage for cross-bracket seeding.
  */
 class RoundRobin implements FormatInterface
 {
@@ -51,6 +50,7 @@ class RoundRobin implements FormatInterface
                ->execute([$tournamentId]);
         }
 
+        // bracket_side is a parameter now (group letter or 'none')
         $insertStmt = $db->prepare(
             "INSERT INTO matches
              (tournament_id, stage_id, bracket_side, group_label, round, match_number, match_order,

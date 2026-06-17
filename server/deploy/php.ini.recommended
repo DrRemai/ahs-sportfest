@@ -1,0 +1,50 @@
+; Endgame Tournaments — recommended production php.ini overrides
+; Copy relevant sections into your system php.ini or a php.ini in /etc/php/8.x/apache2/
+; Adjust paths for your distribution.
+
+; ---------------------------------------------------------------------------
+; OPcache — critical for production PHP performance
+; ---------------------------------------------------------------------------
+opcache.enable=1
+opcache.enable_cli=0
+opcache.memory_consumption=128
+opcache.interned_strings_buffer=8
+opcache.max_accelerated_files=4000
+opcache.revalidate_freq=60
+; Disable timestamp validation — files don't change at runtime on a deploy-based workflow.
+; After each deploy, restart PHP-FPM / Apache to pick up new bytecode.
+opcache.validate_timestamps=0
+opcache.save_comments=0
+
+; ---------------------------------------------------------------------------
+; APCu — user-space cache used by src/Cache.php
+; ---------------------------------------------------------------------------
+apc.enabled=1
+apc.shm_size=64M
+apc.ttl=3600
+apc.enable_cli=0
+
+; ---------------------------------------------------------------------------
+; Session
+; ---------------------------------------------------------------------------
+session.gc_maxlifetime=86400
+session.cookie_httponly=1
+session.cookie_secure=1
+session.cookie_samesite=Strict
+session.use_strict_mode=1
+
+; ---------------------------------------------------------------------------
+; Resource limits
+; ---------------------------------------------------------------------------
+max_execution_time=30
+memory_limit=128M
+post_max_size=8M
+upload_max_filesize=4M
+
+; ---------------------------------------------------------------------------
+; Error handling — production (never expose errors to browser)
+; ---------------------------------------------------------------------------
+display_errors=0
+log_errors=1
+error_log=/var/log/php/error.log
+error_reporting=E_ALL & ~E_DEPRECATED & ~E_STRICT

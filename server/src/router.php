@@ -413,21 +413,15 @@ function api_tournaments(): void
     $sport   = trim($_GET['sport'] ?? '');
     $page    = max(0, (int)($_GET['page'] ?? 0));
     $isAdmin = $user && $user['is_admin'];
-    $userId  = $user ? (int)$user['uid'] : 0;
     $cacheKey = 'tournaments:list:' . md5(serialize([
-        'adm' => $isAdmin, 'uid' => $userId, 'q' => $q, 'sp' => $sport, 'pg' => $page,
+        'adm' => $isAdmin, 'q' => $q, 'sp' => $sport, 'pg' => $page,
     ]));
-    $result = Cache::remember($cacheKey, 20, function() use ($isAdmin, $userId, $q, $sport, $page) {
+    $result = Cache::remember($cacheKey, 20, function() use ($isAdmin, $q, $sport, $page) {
         $where  = [];
         $params = [];
 
         if (!$isAdmin) {
-            if ($userId > 0) {
-                $where[] = "(t.status NOT IN ('draft', 'archived') OR (t.status = 'draft' AND t.created_by = ?))";
-                $params[] = $userId;
-            } else {
-                $where[] = "t.status NOT IN ('draft', 'archived')";
-            }
+            $where[] = "t.status NOT IN ('draft', 'archived')";
         }
         if ($q !== '') {
             $where[]  = 'lower(t.name) LIKE lower(?)';
@@ -665,15 +659,15 @@ function api_tournament_bracket(int $id): void
         return;
     }
 
-    // multi_stage: separate group-phase matches (group_label A/B) from knockout
+    // multi_stage: separate group-phase matches (bracket_side A/B) from knockout
     if ($format === 'multi_stage') {
         $groups       = [];
         $knockoutRnds = [];
 
         foreach ($matches as $m) {
-            $label = $m['group_label'] ?? null;
-            if ($label !== null && strlen($label) === 1 && ctype_upper($label[0])) {
-                $groups[$label][(int)$m['round']][] = $m;
+            $side = $m['bracket_side'] ?? 'none';
+            if (strlen($side) === 1 && ctype_upper($side[0])) {
+                $groups[$side][(int)$m['round']][] = $m;
             } else {
                 $knockoutRnds[(int)$m['round']][] = $m;
             }
@@ -797,12 +791,6 @@ function api_tournament_seed(int $id): void
 
     $formatConfig         = json_decode($fmt['format_config'] ?? '{}', true) ?? [];
     $formatConfig['mode'] = $mode;
-
-    // Wipe any previously generated bracket so re-seeding starts clean.
-    // Safe because seeding is only permitted while status = 'draft' (checked above).
-    $db = db();
-    $db->prepare('DELETE FROM matches WHERE tournament_id = ?')->execute([$id]);
-    $db->prepare('DELETE FROM tournament_stages WHERE tournament_id = ?')->execute([$id]);
 
     try {
         FormatFactory::make($fmt['format'])->generate($id, $teamIds, $formatConfig);

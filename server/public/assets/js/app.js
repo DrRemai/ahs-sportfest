@@ -1,4 +1,4 @@
-import { initRouter, addRoute, navigate, onNavigate } from './router.js';
+import { initRouter, addRoute, navigate } from './router.js';
 import { mountNav } from './components/nav.js';
 import { sseConnect, sseOn } from './utils/sse-client.js';
 import { homeView }       from './views/home.js';
@@ -12,9 +12,8 @@ import { createTournamentView }   from './views/create-tournament.js';
 import { accountView }    from './views/account.js';
 
 export let state = {
-  user:          null,
-  csrf:          null,
-  aboutPageOpen: false,
+  user: null,
+  csrf: null,
 };
 
 export async function api(method, path, body = null) {
@@ -80,9 +79,6 @@ async function boot() {
 
   mountNav();
   initSSE();
-
-  // Any real navigation clears the about-page overlay flag
-  onNavigate(() => { state.aboutPageOpen = false; });
 
   addRoute('/',                                  () => homeView());
   addRoute('/login',                             () => loginView());

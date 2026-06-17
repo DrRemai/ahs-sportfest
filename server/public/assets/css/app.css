@@ -1223,25 +1223,27 @@ input.has-error, select.has-error, textarea.has-error { border-color: var(--red)
 
 /* ── Bracket ─────────────────────────────────────────────────────────────── */
 
-/* Scroll container: centres the bracket when it fits, scrolls from the left
-   when it overflows.
-   .bracket uses width:max-content so it shrink-wraps its rounds; margin:0 auto
-   centres it when the container is wider. When the bracket overflows, margin auto
-   resolves to 0 — the left edge stays at x=0 and only the right side overflows
-   (scrollable). The old display:flex + justify-content:center approach caused
-   symmetric negative-offset overflow, permanently clipping the start edge. */
+/* Scroll container: centres the bracket when it's narrower than the viewport,
+   and scrolls horizontally when it's wider.
+   Both overflow-x:auto AND justify-content:center live on .bracket-outer.
+   This works because the child uses flex-shrink:0 (not min-width:max-content):
+   when the bracket fits, justify-content centres it; when it overflows, the
+   left edge anchors to the container's left edge and only the right overflows
+   (scrollable). min-width:max-content caused centred overflow on both sides,
+   making the left portion unreachable. */
 .bracket-outer {
   overflow-x: auto;
   padding-bottom: 16px;
   scroll-snap-type: x mandatory;
+  display: flex;
+  justify-content: center;
   width: 100%;
 }
 
 .bracket {
   display: flex;
   gap: 32px;
-  width: max-content; /* shrink-wrap to exact content width */
-  margin: 0 auto;    /* centre when fits; left-anchored when overflowing */
+  flex-shrink: 0; /* never shrink below natural size; forces right-only overflow */
 }
 
 .bracket-round {
@@ -1615,23 +1617,6 @@ input.has-error, select.has-error, textarea.has-error { border-color: var(--red)
   text-shadow: 0 0 40px var(--amber-glow);
 }
 .error-message { font-size: 13px; color: var(--text-3); margin-bottom: 32px; }
-
-/* ── Über-Seite ─────────────────────────────────────────────────────────── */
-.about-features {
-  margin: 0;
-  padding-left: var(--sp-5);
-  line-height: 1.8;
-  color: var(--text-1);
-}
-.about-features li + li { margin-top: var(--sp-1); }
-.about-github-link {
-  display: inline-block;
-  color: var(--text-accent);
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 14px;
-}
-.about-github-link:hover { text-decoration: underline; }
 
 /* ── Section headings ────────────────────────────────────────────────────── */
 .section-title {

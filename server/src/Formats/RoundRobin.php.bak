@@ -21,10 +21,9 @@ declare(strict_types=1);
  * for sorting purposes, serialised as null in the API response (displayed as ∞).
  *
  * When config['groups'] > 1 the team list is split into equal groups.
- * Each group plays its own round-robin; group_label ('A', 'B', …) identifies
- * which group a match belongs to; bracket_side is always 'none'.
- * standingsByGroup() returns per-group rankings and is used by MultiStage for
- * cross-bracket seeding.
+ * Each group plays its own round-robin; bracket_side ('A', 'B', …) identifies
+ * which group a match belongs to. standingsByGroup() returns per-group rankings
+ * and is used by MultiStage for cross-bracket seeding.
  */
 class RoundRobin implements FormatInterface
 {
@@ -51,11 +50,12 @@ class RoundRobin implements FormatInterface
                ->execute([$tournamentId]);
         }
 
+        // bracket_side is a parameter now (group letter or 'none')
         $insertStmt = $db->prepare(
             "INSERT INTO matches
-             (tournament_id, stage_id, bracket_side, group_label, round, match_number, match_order,
+             (tournament_id, stage_id, bracket_side, round, match_number, match_order,
               home_team_id, away_team_id, status)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')"
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending')"
         );
 
         if ($groups > 1) {
@@ -68,7 +68,7 @@ class RoundRobin implements FormatInterface
                     $round    = $roundIdx + 1;
                     $matchNum = 1;
                     foreach ($pairs as [$home, $away]) {
-                        $insertStmt->execute([$tournamentId, $stageId, 'none', $side, $round, $matchNum, $matchNum, $home, $away]);
+                        $insertStmt->execute([$tournamentId, $stageId, $side, $round, $matchNum, $matchNum, $home, $away]);
                         $matchNum++;
                     }
                 }
@@ -79,7 +79,7 @@ class RoundRobin implements FormatInterface
                 $round    = $roundIdx + 1;
                 $matchNum = 1;
                 foreach ($pairs as [$home, $away]) {
-                    $insertStmt->execute([$tournamentId, $stageId, 'none', null, $round, $matchNum, $matchNum, $home, $away]);
+                    $insertStmt->execute([$tournamentId, $stageId, 'none', $round, $matchNum, $matchNum, $home, $away]);
                     $matchNum++;
                 }
             }
@@ -178,8 +178,8 @@ class RoundRobin implements FormatInterface
     }
 
     /**
-     * Return standings split by group.
-     * Uses group_label column to discover groups and filter team membership.
+     * Return standings split by group (bracket_side).
+     * Used by MultiStage for cross-bracket seeding.
      * Falls back to ['A' => standings()] when no groups exist.
      */
     public function standingsByGroup(int $tournamentId, ?int $stageId = null): array
@@ -189,10 +189,10 @@ class RoundRobin implements FormatInterface
         if ($stageId) $base[] = $stageId;
 
         $gStmt = db()->prepare(
-            "SELECT DISTINCT group_label FROM matches
+            "SELECT DISTINCT bracket_side FROM matches
              WHERE tournament_id = ? $stageClause
-               AND group_label IS NOT NULL
-             ORDER BY group_label"
+               AND bracket_side NOT IN ('none', 'winners', 'losers')
+             ORDER BY bracket_side"
         );
         $gStmt->execute($base);
         $sides = $gStmt->fetchAll(\PDO::FETCH_COLUMN);
@@ -214,10 +214,10 @@ class RoundRobin implements FormatInterface
 
             $tStmt = db()->prepare(
                 "SELECT home_team_id FROM matches
-                 WHERE tournament_id = ? $stageClause AND group_label = ? AND home_team_id IS NOT NULL
+                 WHERE tournament_id = ? $stageClause AND bracket_side = ? AND home_team_id IS NOT NULL
                  UNION
                  SELECT away_team_id FROM matches
-                 WHERE tournament_id = ? $stageClause AND group_label = ? AND away_team_id IS NOT NULL"
+                 WHERE tournament_id = ? $stageClause AND bracket_side = ? AND away_team_id IS NOT NULL"
             );
             $tStmt->execute($p);
             $groupIds = array_map('intval', $tStmt->fetchAll(\PDO::FETCH_COLUMN));
