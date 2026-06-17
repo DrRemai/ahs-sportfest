@@ -147,7 +147,7 @@ Formatspezifische Einstellungen (Gruppenanzahl, Punkte pro Sieg, Seedingmodus us
 
 1. **SSE-Verbindungslimit:** `public/sse.php` hält zwei PostgreSQL-Verbindungen pro aktivem Browser-Tab offen. Bei vielen gleichzeitigen Nutzern (>40–50) kann PostgreSQLs `max_connections` zum Engpass werden. Siehe [DEPLOYMENT.md](DEPLOYMENT.md) und `deploy/sse-notes.md` für Konfigurationsempfehlungen.
 
-2. **Teamnamen-Claim-Modell:** Ein Teamname ist pro Besitzer einmalig, nicht global. Der erste Benutzer, der einen Namen verwendet, "reserviert" ihn dauerhaft für sich. Es gibt keine globale Namenseinzigartigkeit über Benutzer hinweg.
+2. **Teamnamen-Claim-Modell:** Ein Teamname ist pro Besitzer einmalig, nicht global. Der erste Benutzer, der einen Namen verwendet, "reserviert" ihn dauerhaft für sich. Es gibt keine globale Namenseinzigartigkeit über Benutzer hinweg. Warum? Damit eine Klasse mehrere gleichnamige Teams in allen Sportarten haben kann und man die Übersicht behält.
 
 3. **Fixiertes Sportfest-Format:** Diese Bereitstellung ist auf drei feste Sportarten (Fußball, Volleyball, Hockey) und ein einziges Turnierformat beschränkt — 2 Gruppen à 6 Teams mit Kreuzpaarungen in der K.-o.-Runde. Der Turnier-Assistent (`public/assets/js/views/create-tournament.js`) und die Wizard-Schritte wurden **bewusst** für diesen Einsatzzweck vereinfacht und die Konfiguration fest hinterlegt. Ein zukünftiges Jahr mit anderen Regeln oder Sportarten sollte dort als erstem Anlaufpunkt beginnen, um die Einschränkungen zurückzunehmen. Kommentare mit `// SCHOOL:` im gesamten Code markieren alle solchen Stellen.
 
@@ -155,7 +155,7 @@ Formatspezifische Einstellungen (Gruppenanzahl, Punkte pro Sieg, Seedingmodus us
 
 ## Hinweis
 
-Erstellt von [Dein Name / Abitur-Jahrgang] für [Name der Schule].
+Erstellt von Rémai-Sleisz Domonkos (7BSc 25/26) für AHS Korneuburg.
 Siehe [CONTRIBUTING.md](CONTRIBUTING.md), falls du das Projekt übernimmst oder weiterentwickeln möchtest.
 
 ---
